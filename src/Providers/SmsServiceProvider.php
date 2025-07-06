@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Providers;
+namespace Sureshhemal\SmsSriLanka\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Sureshhemal\SmsSriLanka\Contracts\SmsAuthenticatorContract;
