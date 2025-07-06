@@ -42,6 +42,7 @@ class SmsServiceProvider extends ServiceProvider
         $this->registerHttpClient();
         $this->registerAuthenticator();
         $this->registerSmsService();
+        $this->registerSmsChannel();
     }
 
     /**
@@ -143,6 +144,18 @@ class SmsServiceProvider extends ServiceProvider
                 validator: $app->make(SmsConfigurationValidator::class),
                 payloadBuilder: $app->make(SmsPayloadBuilder::class),
                 httpClient: $app->make(SmsHttpClient::class),
+            );
+        });
+    }
+
+    /**
+     * Register SMS notification channel
+     */
+    private function registerSmsChannel(): void
+    {
+        $this->app->make('Illuminate\Notifications\ChannelManager')->extend('sms', function ($app) {
+            return new \Sureshhemal\SmsSriLanka\Notifications\Channels\SmsChannel(
+                $app->make(SmsServiceContract::class)
             );
         });
     }

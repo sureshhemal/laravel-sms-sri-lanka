@@ -12,8 +12,30 @@ jobs:
 
     strategy:
       matrix:
-        php-version: [8.1, 8.2, 8.3, 8.4]
-        laravel-version: [11, 12]
+        include:
+          # Laravel 10 - supports PHP 8.1+
+          - php-version: '8.1'
+            laravel-version: '10.*'
+          - php-version: '8.2'
+            laravel-version: '10.*'
+          - php-version: '8.3'
+            laravel-version: '10.*'
+          - php-version: '8.4'
+            laravel-version: '10.*'
+          # Laravel 11 - requires PHP 8.2+
+          - php-version: '8.2'
+            laravel-version: '11.*'
+          - php-version: '8.3'
+            laravel-version: '11.*'
+          - php-version: '8.4'
+            laravel-version: '11.*'
+          # Laravel 12 - requires PHP 8.2+
+          - php-version: '8.2'
+            laravel-version: '12.*'
+          - php-version: '8.3'
+            laravel-version: '12.*'
+          - php-version: '8.4'
+            laravel-version: '12.*'
 
     steps:
       - uses: actions/checkout@v4
@@ -36,6 +58,10 @@ jobs:
       - name: Install dependencies
         run: |
           composer install --prefer-dist --no-progress
+
+      - name: Update Laravel version for testing
+        run: |
+          composer require "laravel/framework:${{ matrix.laravel-version }}" "illuminate/support:${{ matrix.laravel-version }}" "illuminate/notifications:${{ matrix.laravel-version }}" --no-interaction --no-progress
 
       - name: Run tests
         run: composer test
