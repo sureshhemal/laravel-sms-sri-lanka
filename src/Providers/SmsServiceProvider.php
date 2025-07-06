@@ -35,6 +35,10 @@ class SmsServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->publishes([
+            __DIR__ . '/../../config/sms-sri-lanka.php' => config_path('sms-sri-lanka.php'),
+        ], 'config');
+
         $this->registerNotificationChannel();
     }
 
