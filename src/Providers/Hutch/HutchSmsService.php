@@ -3,7 +3,7 @@
 namespace Sureshhemal\SmsSriLanka\Providers\Hutch;
 
 use Illuminate\Support\Facades\Config;
-use Sureshhemal\SmsSriLanka\Contracts\SmsAuthenticatorContract;
+use Sureshhemal\SmsSriLanka\Contracts\SmsAuthenticator;
 use Sureshhemal\SmsSriLanka\Contracts\SmsConfigurationValidator;
 use Sureshhemal\SmsSriLanka\Contracts\SmsHttpClient;
 use Sureshhemal\SmsSriLanka\Contracts\SmsPayloadBuilder;
@@ -11,7 +11,7 @@ use Sureshhemal\SmsSriLanka\Contracts\SmsServiceContract;
 
 class HutchSmsService implements SmsServiceContract
 {
-    private SmsAuthenticatorContract $authenticator;
+    private SmsAuthenticator $authenticator;
 
     private SmsConfigurationValidator $validator;
 
@@ -22,10 +22,10 @@ class HutchSmsService implements SmsServiceContract
     private string $baseUrl;
 
     public function __construct(
-        SmsAuthenticatorContract $authenticator,
+        SmsAuthenticator          $authenticator,
         SmsConfigurationValidator $validator,
-        SmsPayloadBuilder $payloadBuilder,
-        SmsHttpClient $httpClient,
+        SmsPayloadBuilder         $payloadBuilder,
+        SmsHttpClient             $httpClient,
     ) {
         $this->authenticator = $authenticator;
         $this->validator = $validator;

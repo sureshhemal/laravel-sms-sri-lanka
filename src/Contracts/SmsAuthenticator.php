@@ -2,7 +2,7 @@
 
 namespace Sureshhemal\SmsSriLanka\Contracts;
 
-interface SmsAuthenticatorContract
+interface SmsAuthenticator
 {
     /**
      * Authenticate with an API and get access tokens

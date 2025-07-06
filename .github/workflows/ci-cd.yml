@@ -71,3 +71,85 @@ jobs:
 
       - name: Run tests
         run: composer test
+
+  release:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get version from composer.json
+        id: version
+        run: |
+          VERSION=$(php -r "echo json_decode(file_get_contents('composer.json'))->version;")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=v$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Check if tag exists
+        id: check_tag
+        run: |
+          if git rev-parse "v${{ steps.version.outputs.version }}" >/dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create and push tag
+        if: steps.check_tag.outputs.exists == 'false'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git tag -a "v${{ steps.version.outputs.version }}" -m "Release version ${{ steps.version.outputs.version }}"
+          git push origin "v${{ steps.version.outputs.version }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release
+        if: steps.check_tag.outputs.exists == 'false'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: "v${{ steps.version.outputs.version }}"
+          release_name: "Release ${{ steps.version.outputs.version }}"
+          draft: false
+          prerelease: false
+          body: |
+            ## 🚀 What's New in v${{ steps.version.outputs.version }}
+
+            ### ✨ Features & Improvements
+            - **Laravel 12 Support**: Full compatibility with Laravel 12
+            - **Enhanced CI/CD**: Improved testing matrix for all PHP/Laravel combinations
+            - **Better Error Handling**: Improved SMS channel registration and HTTP client support
+            - **Dependency Updates**: Added Guzzle HTTP client dependencies for better testing
+
+            ### 🔧 Technical Improvements
+            - **CI/CD Matrix**: Now tests PHP 8.1-8.4 with Laravel 10-12
+            - **Test Coverage**: Fixed HTTP client tests with proper Laravel bootstrapping
+            - **Dependency Management**: Proper testbench version selection for each Laravel version
+            - **Release Automation**: Streamlined release process with automatic Packagist updates
+
+            ### 🐛 Bug Fixes
+            - Fixed SMS notification channel registration
+            - Resolved Guzzle HTTP client dependency issues
+            - Fixed test compatibility across different Laravel versions
+            - Improved error handling in notification system
+
+            ### 📋 Compatibility
+            - **PHP**: 8.1, 8.2, 8.3, 8.4
+            - **Laravel**: 10.x, 11.x, 12.x
+            - **Testbench**: 8.x, 9.x, 10.x
+
+            ### 📦 Installation
+            ```bash
+            composer require sureshhemal/laravel-sms-sri-lanka
+            ```
+
+            **Full Changelog**: https://github.com/sureshhemal/laravel-sms-sri-lanka/commits/v${{ steps.version.outputs.version }}

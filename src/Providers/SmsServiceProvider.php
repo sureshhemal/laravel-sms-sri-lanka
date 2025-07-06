@@ -3,7 +3,7 @@
 namespace Sureshhemal\SmsSriLanka\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Sureshhemal\SmsSriLanka\Contracts\SmsAuthenticatorContract;
+use Sureshhemal\SmsSriLanka\Contracts\SmsAuthenticator;
 use Sureshhemal\SmsSriLanka\Contracts\SmsConfigurationValidator;
 use Sureshhemal\SmsSriLanka\Contracts\SmsHttpClient;
 use Sureshhemal\SmsSriLanka\Contracts\SmsPayloadBuilder;
@@ -98,7 +98,7 @@ class SmsServiceProvider extends ServiceProvider
      */
     private function registerAuthenticator(): void
     {
-        $this->app->bind(SmsAuthenticatorContract::class, function ($app) {
+        $this->app->bind(SmsAuthenticator::class, function ($app) {
             $defaultProvider = config('sms-sri-lanka.default', 'hutch');
             $providerConfig = config("sms-sri-lanka.providers.{$defaultProvider}");
 
@@ -140,7 +140,7 @@ class SmsServiceProvider extends ServiceProvider
             $serviceClass = $providerConfig['service'];
 
             return new $serviceClass(
-                authenticator: $app->make(SmsAuthenticatorContract::class),
+                authenticator: $app->make(SmsAuthenticator::class),
                 validator: $app->make(SmsConfigurationValidator::class),
                 payloadBuilder: $app->make(SmsPayloadBuilder::class),
                 httpClient: $app->make(SmsHttpClient::class),

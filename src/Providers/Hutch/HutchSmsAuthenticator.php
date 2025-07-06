@@ -3,9 +3,9 @@
 namespace Sureshhemal\SmsSriLanka\Providers\Hutch;
 
 use Illuminate\Support\Facades\Http;
-use Sureshhemal\SmsSriLanka\Contracts\SmsAuthenticatorContract;
+use Sureshhemal\SmsSriLanka\Contracts\SmsAuthenticator;
 
-class HutchSmsAuthenticator implements SmsAuthenticatorContract
+class HutchSmsAuthenticator implements SmsAuthenticator
 {
     private ?string $accessToken = null;
 
