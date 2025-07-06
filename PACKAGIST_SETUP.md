@@ -32,7 +32,8 @@ If you prefer webhooks over GitHub Actions:
 
 The GitHub Actions workflow will:
 
-1. **On every push to main**: 
+1. **On every push to main**:
+
    - Run tests across PHP 8.1, 8.2, 8.3 and Laravel 10, 11, 12
    - Check the version in composer.json
    - Create a new git tag if version changed

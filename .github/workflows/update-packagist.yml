@@ -2,21 +2,21 @@ name: Update Packagist
 
 on:
   push:
-    branches: [ main, master ]
-    tags: [ '*' ]
+    branches: [main, master]
+    tags: ["*"]
   release:
-    types: [ published ]
+    types: [published]
 
 jobs:
   update-packagist:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - name: Update Packagist
-      uses: fjogeleit/http-request-action@v1
-      with:
-        url: 'https://packagist.org/api/update-package'
-        method: 'POST'
-        data: '{"repository": {"url": "https://packagist.org/packages/sureshhemal/laravel-sms-sri-lanka"}}'
-        headers: '{"Authorization": "Bearer ${{ secrets.PACKAGIST_TOKEN }}"}'
-        timeout: 30000
+      - name: Update Packagist
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: "https://packagist.org/api/update-package"
+          method: "POST"
+          data: '{"repository": {"url": "https://packagist.org/packages/sureshhemal/laravel-sms-sri-lanka"}}'
+          headers: '{"Authorization": "Bearer ${{ secrets.PACKAGIST_TOKEN }}"}'
+          timeout: 30000
