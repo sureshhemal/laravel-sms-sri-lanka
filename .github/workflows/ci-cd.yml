@@ -1,0 +1,116 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        php-version: [8.1, 8.2, 8.3]
+        laravel-version: [10, 11, 12]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php-version }}
+        extensions: mbstring, dom, fileinfo, mysql
+        coverage: xdebug
+    
+    - name: Cache Composer packages
+      id: composer-cache
+      uses: actions/cache@v3
+      with:
+        path: vendor
+        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-php-
+    
+    - name: Install dependencies
+      run: |
+        composer install --prefer-dist --no-progress
+    
+    - name: Run tests
+      run: composer test
+    
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      if: matrix.php-version == '8.2' && matrix.laravel-version == '11'
+      with:
+        file: ./coverage.xml
+        fail_ci_if_error: false
+
+  release:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Get version from composer.json
+      id: version
+      run: |
+        VERSION=$(php -r "echo json_decode(file_get_contents('composer.json'))->version;")
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "tag=v$VERSION" >> $GITHUB_OUTPUT
+    
+    - name: Check if tag exists
+      id: check_tag
+      run: |
+        if git rev-parse "v${{ steps.version.outputs.version }}" >/dev/null 2>&1; then
+          echo "exists=true" >> $GITHUB_OUTPUT
+        else
+          echo "exists=false" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Create and push tag
+      if: steps.check_tag.outputs.exists == 'false'
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git tag -a "v${{ steps.version.outputs.version }}" -m "Release version ${{ steps.version.outputs.version }}"
+        git push origin "v${{ steps.version.outputs.version }}"
+    
+    - name: Create GitHub Release
+      if: steps.check_tag.outputs.exists == 'false'
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: "v${{ steps.version.outputs.version }}"
+        release_name: "Release ${{ steps.version.outputs.version }}"
+        draft: false
+        prerelease: false
+        body: |
+          ## What's Changed
+          
+          - Laravel 12 support added
+          - Version bumped to ${{ steps.version.outputs.version }}
+          
+          **Full Changelog**: https://github.com/sureshhemal/laravel-sms-sri-lanka/commits/v${{ steps.version.outputs.version }}
+
+  update-packagist:
+    needs: [test, release]
+    runs-on: ubuntu-latest
+    if: always() && (needs.test.result == 'success' && (needs.release.result == 'success' || needs.release.result == 'skipped'))
+    
+    steps:
+    - name: Update Packagist
+      uses: fjogeleit/http-request-action@v1
+      with:
+        url: 'https://packagist.org/api/update-package'
+        method: 'POST'
+        customHeaders: '{"Authorization": "Bearer ${{ secrets.PACKAGIST_TOKEN }}"}'
+        data: '{"repository": {"url": "https://github.com/sureshhemal/laravel-sms-sri-lanka"}}'
+        timeout: 30000
