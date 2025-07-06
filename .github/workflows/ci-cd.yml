@@ -59,6 +59,13 @@ jobs:
         run: |
           composer install --prefer-dist --no-progress
 
+      - name: Remove composer.lock
+        run: rm -f composer.lock
+
+      - name: Require correct Laravel version
+        run: |
+          composer require "laravel/framework:${{ matrix.laravel-version }}" "illuminate/support:${{ matrix.laravel-version }}" "illuminate/notifications:${{ matrix.laravel-version }}" --no-interaction --no-progress --with-all-dependencies
+
       - name: Update Laravel version for testing
         run: |
           composer require "laravel/framework:${{ matrix.laravel-version }}" "illuminate/support:${{ matrix.laravel-version }}" "illuminate/notifications:${{ matrix.laravel-version }}" --no-interaction --no-progress
