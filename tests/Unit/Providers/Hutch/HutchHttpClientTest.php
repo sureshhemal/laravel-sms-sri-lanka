@@ -4,7 +4,7 @@ namespace Tests\Unit\Providers\Hutch;
 
 use Illuminate\Support\Facades\Http;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
+use Sureshhemal\SmsSriLanka\Tests\TestCase;
 use Sureshhemal\SmsSriLanka\Providers\Hutch\HutchHttpClient;
 
 class HutchHttpClientTest extends TestCase
