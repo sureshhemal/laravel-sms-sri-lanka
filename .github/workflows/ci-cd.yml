@@ -55,10 +55,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-php-${{ matrix.php-version }}-laravel-${{ matrix.laravel-version }}-
 
-      - name: Install dependencies
-        run: |
-          composer install --prefer-dist --no-progress
-
       - name: Remove composer.lock
         run: rm -f composer.lock
 
