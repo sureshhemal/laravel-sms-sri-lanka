@@ -1,7 +1,7 @@
 {
   "name": "sureshhemal/laravel-sms-sri-lanka",
   "description": "A Laravel package for sending SMS through Sri Lankan providers (Hutch, with more providers coming soon)",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "type": "library",
   "license": "MIT",
   "keywords": [
