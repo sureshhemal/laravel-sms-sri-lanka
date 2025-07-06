@@ -16,6 +16,6 @@ jobs:
         with:
           url: "https://packagist.org/api/update-package"
           method: "POST"
-          data: '{"repository": {"url": "https://packagist.org/packages/sureshhemal/laravel-sms-sri-lanka"}}'
-          headers: '{"Authorization": "Bearer ${{ secrets.PACKAGIST_TOKEN }}"}'
+          data: '{"repository": {"url": "https://github.com/sureshhemal/laravel-sms-sri-lanka"}}'
+          customHeaders: '{"Authorization": "Bearer ${{ secrets.PACKAGIST_TOKEN }}"}'
           timeout: 30000
