@@ -61,6 +61,13 @@ jobs:
       - name: Require correct Laravel version
         run: |
           composer require "laravel/framework:${{ matrix.laravel-version }}" "illuminate/support:${{ matrix.laravel-version }}" "illuminate/notifications:${{ matrix.laravel-version }}" --no-interaction --no-progress --with-all-dependencies
+          if [[ "${{ matrix.laravel-version }}" == "10.*" ]]; then
+            composer require "orchestra/testbench:^8.0" --no-interaction --no-progress --with-all-dependencies
+          elif [[ "${{ matrix.laravel-version }}" == "11.*" ]]; then
+            composer require "orchestra/testbench:^9.0" --no-interaction --no-progress --with-all-dependencies
+          else
+            composer require "orchestra/testbench:^10.0" --no-interaction --no-progress --with-all-dependencies
+          fi
 
       - name: Update Laravel version for testing
         run: |
